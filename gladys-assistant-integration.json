@@ -8,8 +8,8 @@
     "de": "Dein Linky-Verbrauch und deine Enercoop-Verträge in Gladys: Kosten, Niedertarif, Szenen.",
     "es": "Su consumo Linky y sus contratos Enercoop en Gladys: costes, horas valle y escenas."
   },
-  "version": "0.0.0",
-  "docker_image": "ghcr.io/prohand/gladys-enercoop:0.0.0",
+  "version": "0.0.1",
+  "docker_image": "ghcr.io/prohand/gladys-enercoop:0.0.1",
   "gladys_version": ">=5.3.0",
   "cover_image": "https://raw.githubusercontent.com/prohand/gladys-enercoop/main/cover.png",
   "categories": ["energy"],
@@ -256,7 +256,12 @@
         {
           "key": "date",
           "type": "string",
-          "label": { "en": "Day", "fr": "Jour", "de": "Tag", "es": "Día" }
+          "label": {
+            "en": "Day",
+            "fr": "Jour",
+            "de": "Tag",
+            "es": "Día"
+          }
         },
         {
           "key": "kwh",
@@ -282,7 +287,12 @@
         {
           "key": "date",
           "type": "string",
-          "label": { "en": "Day", "fr": "Jour", "de": "Tag", "es": "Día" }
+          "label": {
+            "en": "Day",
+            "fr": "Jour",
+            "de": "Tag",
+            "es": "Día"
+          }
         },
         {
           "key": "kwh",
@@ -350,7 +360,12 @@
         {
           "key": "period",
           "type": "string",
-          "label": { "en": "Period", "fr": "Période", "de": "Zeitraum", "es": "Periodo" }
+          "label": {
+            "en": "Period",
+            "fr": "Période",
+            "de": "Zeitraum",
+            "es": "Periodo"
+          }
         },
         {
           "key": "label",
@@ -431,7 +446,12 @@
         {
           "key": "period",
           "type": "string",
-          "label": { "en": "Period", "fr": "Période", "de": "Zeitraum", "es": "Periodo" }
+          "label": {
+            "en": "Period",
+            "fr": "Période",
+            "de": "Zeitraum",
+            "es": "Periodo"
+          }
         },
         {
           "key": "label",
@@ -469,7 +489,12 @@
   "widgets": [
     {
       "key": "enercoop",
-      "label": { "en": "Enercoop", "fr": "Enercoop", "de": "Enercoop", "es": "Enercoop" },
+      "label": {
+        "en": "Enercoop",
+        "fr": "Enercoop",
+        "de": "Enercoop",
+        "es": "Enercoop"
+      },
       "description": {
         "en": "Last day, current price and period, 14-day chart, next tariff change.",
         "fr": "Dernier jour, prix et période actuels, 14 derniers jours, prochain changement.",
@@ -536,7 +561,10 @@
               "key": "energy",
               "kind": "consumption",
               "label": "Énergie",
-              "fallback": { "label": "Base", "price": "{{input:price_kwh}}" }
+              "fallback": {
+                "label": "Base",
+                "price": "{{input:price_kwh}}"
+              }
             },
             {
               "key": "subscription",
@@ -630,11 +658,16 @@
               "rules": [
                 {
                   "label": "Heures creuses",
-                  "when": { "time": "{{input:off_peak_slots}}" },
+                  "when": {
+                    "time": "{{input:off_peak_slots}}"
+                  },
                   "price": "{{input:off_peak_price}}"
                 }
               ],
-              "fallback": { "label": "Heures pleines", "price": "{{input:peak_price}}" }
+              "fallback": {
+                "label": "Heures pleines",
+                "price": "{{input:peak_price}}"
+              }
             },
             {
               "key": "subscription",
@@ -718,21 +751,32 @@
               "rules": [
                 {
                   "label": "Heures creuses",
-                  "when": { "weekdays": ["sat", "sun"] },
+                  "when": {
+                    "weekdays": ["sat", "sun"]
+                  },
                   "price": "{{input:off_peak_price}}"
                 },
                 {
                   "label": "Heures creuses",
-                  "when": { "calendar": { "holidays-fr": "holiday" } },
+                  "when": {
+                    "calendar": {
+                      "holidays-fr": "holiday"
+                    }
+                  },
                   "price": "{{input:off_peak_price}}"
                 },
                 {
                   "label": "Heures creuses",
-                  "when": { "time": [["23:00", "06:00"]] },
+                  "when": {
+                    "time": [["23:00", "06:00"]]
+                  },
                   "price": "{{input:off_peak_price}}"
                 }
               ],
-              "fallback": { "label": "Heures pleines", "price": "{{input:peak_price}}" }
+              "fallback": {
+                "label": "Heures pleines",
+                "price": "{{input:peak_price}}"
+              }
             },
             {
               "key": "subscription",

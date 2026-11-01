@@ -6,6 +6,8 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.0.1] - 2026-11-01
+
 ### Added
 
 - Linky consumption of an Enercoop delivery point (PRM), read from Enedis through Conso API: every
@@ -22,4 +24,5 @@ All notable changes to this integration are documented here. The format follows
 - English, French, German and Spanish texts and documentation.
 - `SECURITY.md`, `CHANGELOG.md` and `CLAUDE.md`; CI, release, build and GitHub release workflows.
 
-[Unreleased]: https://github.com/prohand/gladys-enercoop/commits/main
+[Unreleased]: https://github.com/prohand/gladys-enercoop/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/prohand/gladys-enercoop/releases/tag/v0.0.1

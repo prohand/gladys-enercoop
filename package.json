@@ -1,6 +1,6 @@
 {
   "name": "gladys-enercoop",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "Gladys Assistant external integration for Enercoop: Linky consumption and Enercoop energy contracts.",
   "type": "module",
