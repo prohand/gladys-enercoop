@@ -1,0 +1,757 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Enercoop",
+  "description": {
+    "en": "Your Linky consumption and Enercoop contracts in Gladys: costs, off-peak hours, scenes.",
+    "fr": "Votre consommation Linky et vos contrats Enercoop dans Gladys : coûts, heures creuses, scènes.",
+    "de": "Dein Linky-Verbrauch und deine Enercoop-Verträge in Gladys: Kosten, Niedertarif, Szenen.",
+    "es": "Su consumo Linky y sus contratos Enercoop en Gladys: costes, horas valle y escenas."
+  },
+  "version": "0.0.0",
+  "docker_image": "ghcr.io/prohand/gladys-enercoop:0.0.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/prohand/gladys-enercoop/main/cover.png",
+  "categories": ["energy"],
+  "keywords": [
+    "enercoop",
+    "linky",
+    "enedis",
+    "heures creuses",
+    "flexibilité",
+    "électricité verte",
+    "conso api",
+    "prm",
+    "fournisseur électricité",
+    "coopérative"
+  ],
+  "countries": ["FR"],
+  "transports": ["cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "Enercoop supplies the electricity, Enedis reads the Linky meter. The readings come from Enedis through Conso API, a free service: give your consent once on conso.boris.sh, then paste your PRM (14 digits, on your Enercoop bill) and the token you get. The readings of a day arrive the next morning. Then create the meter in the Discovery tab and attach an Enercoop contract to it in the Energy settings of Gladys.",
+        "fr": "Enercoop fournit l'électricité, Enedis relève le compteur Linky. Les relevés viennent d'Enedis par Conso API, un service gratuit : donnez votre consentement une fois sur conso.boris.sh, puis collez votre PRM (14 chiffres, sur votre facture Enercoop) et le jeton obtenu. Les relevés d'une journée arrivent le lendemain matin. Créez ensuite le compteur dans l'onglet Découverte et associez-lui un contrat Enercoop dans les réglages Énergie de Gladys.",
+        "de": "Enercoop liefert den Strom, Enedis liest den Linky-Zähler ab. Die Messwerte kommen von Enedis über Conso API, einen kostenlosen Dienst: Erteile einmal deine Zustimmung auf conso.boris.sh und füge dann deine PRM (14 Ziffern, auf deiner Enercoop-Rechnung) und das erhaltene Token ein. Die Werte eines Tages kommen am nächsten Morgen. Lege danach den Zähler im Reiter Erkennung an und ordne ihm in den Energie-Einstellungen von Gladys einen Enercoop-Vertrag zu.",
+        "es": "Enercoop suministra la electricidad, Enedis lee el contador Linky. Las lecturas vienen de Enedis a través de Conso API, un servicio gratuito: dé su consentimiento una vez en conso.boris.sh y pegue su PRM (14 dígitos, en su factura de Enercoop) y el token obtenido. Las lecturas de un día llegan a la mañana siguiente. Después cree el contador en la pestaña Descubrimiento y asígnele un contrato de Enercoop en los ajustes de Energía de Gladys."
+      },
+      "links": [
+        {
+          "url": "https://conso.boris.sh",
+          "label": {
+            "en": "Get a Conso API token",
+            "fr": "Obtenir un jeton Conso API",
+            "de": "Conso-API-Token erhalten",
+            "es": "Obtener un token de Conso API"
+          }
+        },
+        {
+          "url": "https://www.enercoop.fr",
+          "label": {
+            "en": "Enercoop",
+            "fr": "Enercoop",
+            "de": "Enercoop",
+            "es": "Enercoop"
+          }
+        }
+      ]
+    },
+    {
+      "key": "prm",
+      "type": "string",
+      "label": {
+        "en": "PRM (delivery point)",
+        "fr": "PRM (point de livraison)",
+        "de": "PRM (Lieferstelle)",
+        "es": "PRM (punto de suministro)"
+      },
+      "description": {
+        "en": "The 14 digits of your delivery point, on your Enercoop bill or your Linky (key 'n° PRM').",
+        "fr": "Les 14 chiffres de votre point de livraison, sur votre facture Enercoop ou votre Linky (touche « n° PRM »).",
+        "de": "Die 14 Ziffern deiner Lieferstelle, auf deiner Enercoop-Rechnung oder am Linky (Taste „n° PRM“).",
+        "es": "Los 14 dígitos de su punto de suministro, en su factura de Enercoop o en su Linky (tecla «n° PRM»)."
+      },
+      "placeholder": {
+        "en": "e.g. 12345678901234",
+        "fr": "ex. 12345678901234",
+        "de": "z. B. 12345678901234",
+        "es": "p. ej. 12345678901234"
+      },
+      "required": true
+    },
+    {
+      "key": "token",
+      "type": "secret",
+      "label": {
+        "en": "Conso API token",
+        "fr": "Jeton Conso API",
+        "de": "Conso-API-Token",
+        "es": "Token de Conso API"
+      },
+      "description": {
+        "en": "Given by conso.boris.sh at the end of the Enedis consent. Never shown again once saved.",
+        "fr": "Fourni par conso.boris.sh à la fin du consentement Enedis. Jamais réaffiché une fois enregistré.",
+        "de": "Wird von conso.boris.sh am Ende der Enedis-Zustimmung angezeigt. Nach dem Speichern nie wieder sichtbar.",
+        "es": "Lo proporciona conso.boris.sh al final del consentimiento de Enedis. No se vuelve a mostrar una vez guardado."
+      },
+      "required": true
+    },
+    {
+      "key": "granularity",
+      "type": "select",
+      "label": {
+        "en": "Readings",
+        "fr": "Relevés",
+        "de": "Messwerte",
+        "es": "Lecturas"
+      },
+      "description": {
+        "en": "Every 30 minutes is needed to price off-peak hours right; it requires the half-hourly collection enabled in your Enedis account.",
+        "fr": "La demi-heure est nécessaire pour bien chiffrer les heures creuses ; elle demande la collecte horaire activée dans votre espace Enedis.",
+        "de": "Halbstündlich ist nötig, um Niedertarifzeiten richtig zu berechnen; dafür muss die halbstündliche Erfassung im Enedis-Konto aktiv sein.",
+        "es": "Cada 30 minutos es necesario para valorar bien las horas valle; requiere activar la recogida horaria en su cuenta de Enedis."
+      },
+      "required": false,
+      "default": "thirty_minutes",
+      "options": [
+        {
+          "value": "thirty_minutes",
+          "label": {
+            "en": "Every 30 minutes (load curve)",
+            "fr": "Toutes les 30 minutes (courbe de charge)",
+            "de": "Alle 30 Minuten (Lastgang)",
+            "es": "Cada 30 minutos (curva de carga)"
+          }
+        },
+        {
+          "value": "daily",
+          "label": {
+            "en": "Daily",
+            "fr": "Quotidiens",
+            "de": "Täglich",
+            "es": "Diarias"
+          }
+        }
+      ]
+    },
+    {
+      "key": "history_days",
+      "type": "number",
+      "label": {
+        "en": "History to import (days)",
+        "fr": "Historique à importer (jours)",
+        "de": "Zu importierender Verlauf (Tage)",
+        "es": "Historial a importar (días)"
+      },
+      "description": {
+        "en": "How far back the first sync reads, up to a year.",
+        "fr": "Jusqu'où remonte la première synchronisation, un an au plus.",
+        "de": "Wie weit die erste Synchronisierung zurückgeht, höchstens ein Jahr.",
+        "es": "Hasta dónde llega la primera sincronización, un año como máximo."
+      },
+      "required": false,
+      "default": 30,
+      "min": 1,
+      "max": 365
+    },
+    {
+      "key": "sync_interval_hours",
+      "type": "number",
+      "label": {
+        "en": "Sync interval (hours)",
+        "fr": "Intervalle de synchronisation (heures)",
+        "de": "Synchronisierungsintervall (Stunden)",
+        "es": "Intervalo de sincronización (horas)"
+      },
+      "description": {
+        "en": "How often Enedis is asked for new readings. They change once a day: there is no point in asking more often than every few hours.",
+        "fr": "Fréquence à laquelle Enedis est interrogé. Les relevés changent une fois par jour : inutile de demander plus souvent que toutes les quelques heures.",
+        "de": "Wie oft Enedis nach neuen Messwerten gefragt wird. Sie ändern sich einmal am Tag: Häufiger als alle paar Stunden lohnt sich nicht.",
+        "es": "Frecuencia con la que se consulta a Enedis. Las lecturas cambian una vez al día: no sirve de nada preguntar más que cada pocas horas."
+      },
+      "required": false,
+      "default": 6,
+      "min": 1,
+      "max": 24
+    },
+    {
+      "key": "daily_threshold_kwh",
+      "type": "number",
+      "label": {
+        "en": "Daily alert threshold (kWh)",
+        "fr": "Seuil d'alerte quotidien (kWh)",
+        "de": "Tägliche Warnschwelle (kWh)",
+        "es": "Umbral de alerta diario (kWh)"
+      },
+      "description": {
+        "en": "A day above it fires the scene trigger 'Daily consumption over the threshold'. 0 turns it off.",
+        "fr": "Une journée au-dessus déclenche la scène « Consommation quotidienne au-dessus du seuil ». 0 la désactive.",
+        "de": "Ein Tag darüber löst den Szenenauslöser „Tagesverbrauch über der Schwelle“ aus. 0 schaltet ihn ab.",
+        "es": "Un día por encima dispara el desencadenante «Consumo diario por encima del umbral». 0 lo desactiva."
+      },
+      "required": false,
+      "default": 0,
+      "min": 0,
+      "max": 500
+    },
+    {
+      "key": "alsace_moselle",
+      "type": "boolean",
+      "label": {
+        "en": "Alsace-Moselle public holidays",
+        "fr": "Jours fériés d'Alsace-Moselle",
+        "de": "Feiertage Elsass-Mosel",
+        "es": "Festivos de Alsacia-Mosela"
+      },
+      "description": {
+        "en": "Adds Good Friday and 26 December to the holidays priced off-peak by the 'Night and weekend' offer.",
+        "fr": "Ajoute le Vendredi saint et le 26 décembre aux jours fériés facturés en heures creuses par l'offre « Nuit et week-end ».",
+        "de": "Fügt Karfreitag und den 26. Dezember den Feiertagen hinzu, die das Angebot „Nacht und Wochenende“ zum Niedertarif berechnet.",
+        "es": "Añade el Viernes Santo y el 26 de diciembre a los festivos facturados en horas valle por la oferta «Noche y fin de semana»."
+      },
+      "required": false,
+      "default": false
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "timeout_seconds": 45
+    },
+    {
+      "key": "sync_now",
+      "label": {
+        "en": "Sync now",
+        "fr": "Synchroniser maintenant",
+        "de": "Jetzt synchronisieren",
+        "es": "Sincronizar ahora"
+      },
+      "timeout_seconds": 120
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "daily_consumption_available",
+      "label": {
+        "en": "Enercoop: new daily consumption",
+        "fr": "Enercoop : nouvelle consommation quotidienne",
+        "de": "Enercoop: neuer Tagesverbrauch",
+        "es": "Enercoop: nuevo consumo diario"
+      },
+      "variables": [
+        {
+          "key": "date",
+          "type": "string",
+          "label": { "en": "Day", "fr": "Jour", "de": "Tag", "es": "Día" }
+        },
+        {
+          "key": "kwh",
+          "type": "number",
+          "label": {
+            "en": "Consumption (kWh)",
+            "fr": "Consommation (kWh)",
+            "de": "Verbrauch (kWh)",
+            "es": "Consumo (kWh)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "daily_threshold_exceeded",
+      "label": {
+        "en": "Enercoop: daily consumption over the threshold",
+        "fr": "Enercoop : consommation quotidienne au-dessus du seuil",
+        "de": "Enercoop: Tagesverbrauch über der Schwelle",
+        "es": "Enercoop: consumo diario por encima del umbral"
+      },
+      "variables": [
+        {
+          "key": "date",
+          "type": "string",
+          "label": { "en": "Day", "fr": "Jour", "de": "Tag", "es": "Día" }
+        },
+        {
+          "key": "kwh",
+          "type": "number",
+          "label": {
+            "en": "Consumption (kWh)",
+            "fr": "Consommation (kWh)",
+            "de": "Verbrauch (kWh)",
+            "es": "Consumo (kWh)"
+          }
+        },
+        {
+          "key": "threshold_kwh",
+          "type": "number",
+          "label": {
+            "en": "Threshold (kWh)",
+            "fr": "Seuil (kWh)",
+            "de": "Schwelle (kWh)",
+            "es": "Umbral (kWh)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "tariff_period_changed",
+      "label": {
+        "en": "Enercoop: tariff period changed",
+        "fr": "Enercoop : changement de période tarifaire",
+        "de": "Enercoop: Tarifzeitraum gewechselt",
+        "es": "Enercoop: cambio de periodo tarifario"
+      },
+      "fields": [
+        {
+          "key": "period",
+          "type": "multi_select",
+          "label": {
+            "en": "New period",
+            "fr": "Nouvelle période",
+            "de": "Neuer Zeitraum",
+            "es": "Nuevo periodo"
+          },
+          "options": [
+            {
+              "value": "off_peak",
+              "label": {
+                "en": "Off-peak hours",
+                "fr": "Heures creuses",
+                "de": "Niedertarif",
+                "es": "Horas valle"
+              }
+            },
+            {
+              "value": "peak",
+              "label": {
+                "en": "Peak hours",
+                "fr": "Heures pleines",
+                "de": "Hochtarif",
+                "es": "Horas punta"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "period",
+          "type": "string",
+          "label": { "en": "Period", "fr": "Période", "de": "Zeitraum", "es": "Periodo" }
+        },
+        {
+          "key": "label",
+          "type": "string",
+          "label": {
+            "en": "Period name",
+            "fr": "Nom de la période",
+            "de": "Name des Zeitraums",
+            "es": "Nombre del periodo"
+          }
+        },
+        {
+          "key": "price",
+          "type": "number",
+          "label": {
+            "en": "Price (€/kWh)",
+            "fr": "Prix (€/kWh)",
+            "de": "Preis (€/kWh)",
+            "es": "Precio (€/kWh)"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "sync_consumption",
+      "label": {
+        "en": "Enercoop: read the meter now",
+        "fr": "Enercoop : relever le compteur maintenant",
+        "de": "Enercoop: Zähler jetzt ablesen",
+        "es": "Enercoop: leer el contador ahora"
+      },
+      "timeout_seconds": 120,
+      "outputs": [
+        {
+          "key": "published",
+          "type": "number",
+          "label": {
+            "en": "Readings published",
+            "fr": "Relevés publiés",
+            "de": "Veröffentlichte Messwerte",
+            "es": "Lecturas publicadas"
+          }
+        },
+        {
+          "key": "last_day",
+          "type": "string",
+          "label": {
+            "en": "Last day",
+            "fr": "Dernier jour",
+            "de": "Letzter Tag",
+            "es": "Último día"
+          }
+        },
+        {
+          "key": "last_day_kwh",
+          "type": "number",
+          "label": {
+            "en": "Last day (kWh)",
+            "fr": "Dernier jour (kWh)",
+            "de": "Letzter Tag (kWh)",
+            "es": "Último día (kWh)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "get_current_tariff",
+      "label": {
+        "en": "Enercoop: get the current price",
+        "fr": "Enercoop : lire le prix actuel",
+        "de": "Enercoop: aktuellen Preis abfragen",
+        "es": "Enercoop: obtener el precio actual"
+      },
+      "timeout_seconds": 10,
+      "outputs": [
+        {
+          "key": "period",
+          "type": "string",
+          "label": { "en": "Period", "fr": "Période", "de": "Zeitraum", "es": "Periodo" }
+        },
+        {
+          "key": "label",
+          "type": "string",
+          "label": {
+            "en": "Period name",
+            "fr": "Nom de la période",
+            "de": "Name des Zeitraums",
+            "es": "Nombre del periodo"
+          }
+        },
+        {
+          "key": "price",
+          "type": "number",
+          "label": {
+            "en": "Price (€/kWh)",
+            "fr": "Prix (€/kWh)",
+            "de": "Preis (€/kWh)",
+            "es": "Precio (€/kWh)"
+          }
+        },
+        {
+          "key": "is_off_peak",
+          "type": "boolean",
+          "label": {
+            "en": "Off-peak hours",
+            "fr": "Heures creuses",
+            "de": "Niedertarif",
+            "es": "Horas valle"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "enercoop",
+      "label": { "en": "Enercoop", "fr": "Enercoop", "de": "Enercoop", "es": "Enercoop" },
+      "description": {
+        "en": "Last day, current price and period, 14-day chart, next tariff change.",
+        "fr": "Dernier jour, prix et période actuels, 14 derniers jours, prochain changement.",
+        "de": "Letzter Tag, aktueller Preis und Zeitraum, 14 Tage, nächster Tarifwechsel.",
+        "es": "Último día, precio y periodo actuales, 14 días, próximo cambio de tarifa."
+      },
+      "icon": "zap",
+      "action_timeout_seconds": 120
+    }
+  ],
+  "energy_contracts": {
+    "templates": [
+      {
+        "key": "enercoop-base",
+        "name": {
+          "en": "Enercoop – Base offer",
+          "fr": "Enercoop – Offre Base",
+          "de": "Enercoop – Basisangebot",
+          "es": "Enercoop – Oferta Base"
+        },
+        "description": {
+          "en": "One price all day. Prices incl. VAT, indicative for 6 kVA (October 2026): copy those of your bill.",
+          "fr": "Un seul prix toute la journée. Prix TTC indicatifs pour 6 kVA (octobre 2026) : reprenez ceux de votre facture.",
+          "de": "Ein Preis den ganzen Tag. Preise inkl. MwSt., Richtwerte für 6 kVA (Oktober 2026): Übernimm die deiner Rechnung.",
+          "es": "Un solo precio todo el día. Precios con IVA, orientativos para 6 kVA (octubre de 2026): copie los de su factura."
+        },
+        "country": "FR",
+        "currency": "EUR",
+        "timezone": "Europe/Paris",
+        "pricing_mode": "rules",
+        "version": "2026-10-01",
+        "inputs": [
+          {
+            "key": "price_kwh",
+            "type": "number",
+            "unit": "EUR/kWh",
+            "default": 0.2531,
+            "required": true,
+            "label": {
+              "en": "Price per kWh incl. VAT",
+              "fr": "Prix du kWh TTC",
+              "de": "Preis pro kWh inkl. MwSt.",
+              "es": "Precio del kWh con IVA"
+            }
+          },
+          {
+            "key": "subscription_monthly",
+            "type": "number",
+            "unit": "EUR/month",
+            "default": 14.82,
+            "required": true,
+            "label": {
+              "en": "Monthly subscription incl. VAT",
+              "fr": "Abonnement mensuel TTC",
+              "de": "Monatliche Grundgebühr inkl. MwSt.",
+              "es": "Suscripción mensual con IVA"
+            }
+          }
+        ],
+        "tariff": {
+          "tariff_version": 1,
+          "components": [
+            {
+              "key": "energy",
+              "kind": "consumption",
+              "label": "Énergie",
+              "fallback": { "label": "Base", "price": "{{input:price_kwh}}" }
+            },
+            {
+              "key": "subscription",
+              "kind": "fixed",
+              "label": "Abonnement",
+              "amount": "{{input:subscription_monthly}}",
+              "per": "month"
+            }
+          ]
+        }
+      },
+      {
+        "key": "enercoop-flexibilite-heures-creuses",
+        "name": {
+          "en": "Enercoop – Flexibility, off-peak hours",
+          "fr": "Enercoop – Flexibilité heures creuses",
+          "de": "Enercoop – Flexibilität Niedertarif",
+          "es": "Enercoop – Flexibilidad horas valle"
+        },
+        "description": {
+          "en": "Peak / off-peak prices. The off-peak hours are those of your meter (Enedis), written on your bill. Prices incl. VAT, indicative for 6 kVA (October 2026): copy those of your bill.",
+          "fr": "Prix heures pleines / heures creuses. Les heures creuses sont celles de votre compteur (Enedis), indiquées sur votre facture. Prix TTC indicatifs pour 6 kVA (octobre 2026) : reprenez ceux de votre facture.",
+          "de": "Hoch- / Niedertarifpreise. Die Niedertarifzeiten sind die deines Zählers (Enedis), auf deiner Rechnung angegeben. Preise inkl. MwSt., Richtwerte für 6 kVA (Oktober 2026): Übernimm die deiner Rechnung.",
+          "es": "Precios de horas punta / valle. Las horas valle son las de su contador (Enedis), indicadas en su factura. Precios con IVA, orientativos para 6 kVA (octubre de 2026): copie los de su factura."
+        },
+        "country": "FR",
+        "currency": "EUR",
+        "timezone": "Europe/Paris",
+        "pricing_mode": "rules",
+        "version": "2026-10-01",
+        "inputs": [
+          {
+            "key": "off_peak_slots",
+            "type": "time_intervals",
+            "default": [["22:00", "06:00"]],
+            "required": true,
+            "label": {
+              "en": "Off-peak hours",
+              "fr": "Heures creuses",
+              "de": "Niedertarifzeiten",
+              "es": "Horas valle"
+            }
+          },
+          {
+            "key": "peak_price",
+            "type": "number",
+            "unit": "EUR/kWh",
+            "default": 0.2776,
+            "required": true,
+            "label": {
+              "en": "Peak price per kWh incl. VAT",
+              "fr": "Prix du kWh heures pleines TTC",
+              "de": "Hochtarifpreis pro kWh inkl. MwSt.",
+              "es": "Precio del kWh en horas punta con IVA"
+            }
+          },
+          {
+            "key": "off_peak_price",
+            "type": "number",
+            "unit": "EUR/kWh",
+            "default": 0.1898,
+            "required": true,
+            "label": {
+              "en": "Off-peak price per kWh incl. VAT",
+              "fr": "Prix du kWh heures creuses TTC",
+              "de": "Niedertarifpreis pro kWh inkl. MwSt.",
+              "es": "Precio del kWh en horas valle con IVA"
+            }
+          },
+          {
+            "key": "subscription_monthly",
+            "type": "number",
+            "unit": "EUR/month",
+            "default": 15.17,
+            "required": true,
+            "label": {
+              "en": "Monthly subscription incl. VAT",
+              "fr": "Abonnement mensuel TTC",
+              "de": "Monatliche Grundgebühr inkl. MwSt.",
+              "es": "Suscripción mensual con IVA"
+            }
+          }
+        ],
+        "tariff": {
+          "tariff_version": 1,
+          "components": [
+            {
+              "key": "energy",
+              "kind": "consumption",
+              "label": "Énergie",
+              "rules": [
+                {
+                  "label": "Heures creuses",
+                  "when": { "time": "{{input:off_peak_slots}}" },
+                  "price": "{{input:off_peak_price}}"
+                }
+              ],
+              "fallback": { "label": "Heures pleines", "price": "{{input:peak_price}}" }
+            },
+            {
+              "key": "subscription",
+              "kind": "fixed",
+              "label": "Abonnement",
+              "amount": "{{input:subscription_monthly}}",
+              "per": "month"
+            }
+          ]
+        }
+      },
+      {
+        "key": "enercoop-flexibilite-nuit-week-end",
+        "name": {
+          "en": "Enercoop – Flexibility, night and weekend",
+          "fr": "Enercoop – Flexibilité nuit et week-end",
+          "de": "Enercoop – Flexibilität Nacht und Wochenende",
+          "es": "Enercoop – Flexibilidad noche y fin de semana"
+        },
+        "description": {
+          "en": "Off-peak price on weekdays from 23:00 to 06:00, all weekend and on public holidays (fixed by Enercoop). Prices incl. VAT, indicative for 6 kVA (October 2026): copy those of your bill.",
+          "fr": "Prix heures creuses en semaine de 23 h à 6 h, tout le week-end et les jours fériés (horaires fixés par Enercoop). Prix TTC indicatifs pour 6 kVA (octobre 2026) : reprenez ceux de votre facture.",
+          "de": "Niedertarif werktags von 23 bis 6 Uhr, das ganze Wochenende und an Feiertagen (von Enercoop festgelegt). Preise inkl. MwSt., Richtwerte für 6 kVA (Oktober 2026): Übernimm die deiner Rechnung.",
+          "es": "Precio de horas valle entre semana de 23:00 a 06:00, todo el fin de semana y los festivos (fijado por Enercoop). Precios con IVA, orientativos para 6 kVA (octubre de 2026): copie los de su factura."
+        },
+        "country": "FR",
+        "currency": "EUR",
+        "timezone": "Europe/Paris",
+        "pricing_mode": "rules",
+        "version": "2026-10-01",
+        "calendars": ["holidays-fr"],
+        "inputs": [
+          {
+            "key": "peak_price",
+            "type": "number",
+            "unit": "EUR/kWh",
+            "default": 0.3064,
+            "required": true,
+            "label": {
+              "en": "Peak price per kWh incl. VAT",
+              "fr": "Prix du kWh heures pleines TTC",
+              "de": "Hochtarifpreis pro kWh inkl. MwSt.",
+              "es": "Precio del kWh en horas punta con IVA"
+            }
+          },
+          {
+            "key": "off_peak_price",
+            "type": "number",
+            "unit": "EUR/kWh",
+            "default": 0.1729,
+            "required": true,
+            "label": {
+              "en": "Off-peak price per kWh incl. VAT",
+              "fr": "Prix du kWh heures creuses TTC",
+              "de": "Niedertarifpreis pro kWh inkl. MwSt.",
+              "es": "Precio del kWh en horas valle con IVA"
+            }
+          },
+          {
+            "key": "subscription_monthly",
+            "type": "number",
+            "unit": "EUR/month",
+            "default": 15.17,
+            "required": true,
+            "label": {
+              "en": "Monthly subscription incl. VAT",
+              "fr": "Abonnement mensuel TTC",
+              "de": "Monatliche Grundgebühr inkl. MwSt.",
+              "es": "Suscripción mensual con IVA"
+            }
+          }
+        ],
+        "tariff": {
+          "tariff_version": 1,
+          "calendars": ["holidays-fr"],
+          "components": [
+            {
+              "key": "energy",
+              "kind": "consumption",
+              "label": "Énergie",
+              "rules": [
+                {
+                  "label": "Heures creuses",
+                  "when": { "weekdays": ["sat", "sun"] },
+                  "price": "{{input:off_peak_price}}"
+                },
+                {
+                  "label": "Heures creuses",
+                  "when": { "calendar": { "holidays-fr": "holiday" } },
+                  "price": "{{input:off_peak_price}}"
+                },
+                {
+                  "label": "Heures creuses",
+                  "when": { "time": [["23:00", "06:00"]] },
+                  "price": "{{input:off_peak_price}}"
+                }
+              ],
+              "fallback": { "label": "Heures pleines", "price": "{{input:peak_price}}" }
+            },
+            {
+              "key": "subscription",
+              "kind": "fixed",
+              "label": "Abonnement",
+              "amount": "{{input:subscription_monthly}}",
+              "per": "month"
+            }
+          ]
+        }
+      }
+    ],
+    "calendars": [
+      {
+        "key": "holidays-fr",
+        "granularity": "day",
+        "timezone": "Europe/Paris",
+        "values": ["holiday", "regular"]
+      }
+    ]
+  }
+}
