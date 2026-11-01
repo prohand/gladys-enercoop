@@ -2,7 +2,7 @@
   "name": "gladys-enercoop",
   "version": "0.0.1",
   "private": true,
-  "description": "Gladys Assistant external integration for Enercoop: Linky consumption and Enercoop energy contracts.",
+  "description": "Gladys Assistant external integration for Enercoop: Enercoop energy contracts, off-peak hours and public holidays.",
   "type": "module",
   "main": "index.js",
   "scripts": {

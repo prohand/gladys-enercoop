@@ -32,20 +32,18 @@ the integration, and the advisory is published once users can update.
 In scope: the code of this repository and the Docker image it publishes.
 
 Out of scope: Gladys Assistant itself (report to
-[GladysAssistant/Gladys](https://github.com/GladysAssistant/Gladys/security)), Conso API
-(report to [bokub/conso-api](https://github.com/bokub/conso-api)), Enedis and Enercoop.
+[GladysAssistant/Gladys](https://github.com/GladysAssistant/Gladys/security)), Enedis and Enercoop.
 
 ## What the integration handles
 
-- **The Conso API token** gives read access to the consumption of a delivery point. It is
-  stored by Gladys in a `secret` field (never sent back to the browser), sent only to
-  `https://conso.boris.sh` in the `Authorization` header, and never written to a log.
-- **The PRM** identifies the home: it is masked (`1234 •••••• 5678`) in the logs and in the
-  widget.
-- The container only writes to `/data` (`state.json`: dates and daily totals, no secret).
+- No secret and no personal identifier: no token, no PRM, no meter reading. The only setting
+  is the Alsace-Moselle holidays option.
+- No network access besides the Gladys host API, and nothing written to disk.
+- It reads the users' Enercoop contracts (prices typed in by the user) through the Gladys
+  host API, never the meter nor the consumption.
 
 ## Good practices for users
 
-- Keep the token only in the integration's secret field. Revoke it from your Enedis account
-  if you think it leaked, then give your consent again on conso.boris.sh.
+- Coming from 0.0.1, which read the Linky through Conso API: you can revoke that consent
+  from your Enedis account.
 - Keep Gladys and the integration up to date.

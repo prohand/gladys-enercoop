@@ -2,20 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SCENE_ACTIONS } from '../src/capabilities/scenes.js';
 import { MANIFEST } from '../src/enercoop/tariffs.js';
-import { createFakeFetch, dayOfLoadCurve, loadCurveAnswer } from './helpers/fixtures.js';
 import { setup } from './helpers/setup.js';
 
 const declaredOutputs = (key) =>
   MANIFEST.scene_actions.find((action) => action.key === key).outputs.map((output) => output.key);
-
-test('sync_consumption returns its declared outputs', async () => {
-  const { service } = await setup({
-    fetchImpl: createFakeFetch(() => loadCurveAnswer(dayOfLoadCurve('2026-04-03', 1000))),
-  });
-  const outputs = await SCENE_ACTIONS.sync_consumption(service, { fields: {} });
-  assert.deepEqual(outputs, { published: 48, last_day: '2026-04-03', last_day_kwh: 24 });
-  assert.deepEqual(Object.keys(outputs).sort(), declaredOutputs('sync_consumption').sort());
-});
 
 test('get_current_tariff returns the price of the contract, or fails without one', async () => {
   const { service } = await setup({
@@ -37,12 +27,17 @@ test('get_current_tariff returns the price of the contract, or fails without one
 });
 
 test('the scene events only carry the keys their trigger declares', async () => {
-  const { gladys, service } = await setup({
-    config: { daily_threshold_kwh: 1 },
-    fetchImpl: createFakeFetch(() => loadCurveAnswer(dayOfLoadCurve('2026-04-03', 1000))),
+  const { gladys, service, clock } = await setup({
+    now: '2026-04-07T20:59:00Z', // Tuesday 22:59 in Paris
+    contracts: [
+      { id: 'c', template_key: 'enercoop-flexibilite-nuit-week-end', inputs: {}, status: 'active' },
+    ],
   });
-  await service.sync();
-  assert.equal(gladys.fake.sceneEvents.length, 2);
+  await service.refreshContracts();
+  await service.checkTariff();
+  clock.now += 60_000;
+  assert.equal(await service.checkTariff(), true);
+  assert.equal(gladys.fake.sceneEvents.length, 1);
   for (const { key, data } of gladys.fake.sceneEvents) {
     const trigger = MANIFEST.scene_triggers.find((entry) => entry.key === key);
     assert.ok(trigger, `${key} is not declared`);

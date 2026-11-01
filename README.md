@@ -1,8 +1,8 @@
 # Enercoop for Gladys Assistant
 
-External integration for [Gladys Assistant](https://gladysassistant.com) that brings your **Enercoop** electricity
-into Gladys: the **Linky** consumption of your delivery point, the **Enercoop energy contracts** to price it, and
-off-peak hours you can build scenes on.
+External integration for [Gladys Assistant](https://gladysassistant.com) that brings the **Enercoop energy
+contracts** into Gladys: Gladys prices the consumption of the user's own meter with them, and the integration tells
+when off-peak hours start (weekends and public holidays included) for scenes.
 
 Built from the official [JavaScript template](https://github.com/GladysAssistant/integration-template-js) with the
 SDK [`@gladysassistant/integration-sdk`](https://github.com/GladysAssistant/integration-sdk-js). Requires
@@ -13,25 +13,22 @@ User documentation: [English](docs/en.md) · [Français](docs/fr.md) · [Deutsch
 
 ## Features
 
-| Surface               | What it does                                                                                      |
-| --------------------- | ------------------------------------------------------------------------------------------------- |
-| Device                | `Linky Enercoop` meter, one consumption feature: every 30 minutes (load curve) or daily           |
-| Energy contracts      | Templates **Base**, **Flexibilité heures creuses**, **Flexibilité nuit et week-end** (rules mode) |
-| Tariff calendar       | `holidays-fr`: French public holidays (+ Alsace-Moselle), computed locally                        |
-| Scene triggers        | `daily_consumption_available`, `daily_threshold_exceeded`, `tariff_period_changed`                |
-| Scene actions         | `sync_consumption`, `get_current_tariff`                                                          |
-| Dashboard widget      | `enercoop`: last day, price and period now, 14-day chart, next change, sync status, Sync button   |
-| Configuration buttons | Test the connection, Sync now                                                                     |
-| Transport tag         | **cloud** (Enedis → Conso API → Gladys); the device badge turns "unreachable" when a sync fails   |
-| Languages             | English, French, German, Spanish (manifest, messages, widget, documentation)                      |
+| Surface              | What it does                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------- |
+| Energy contracts     | Templates **Base**, **Flexibilité heures creuses**, **Flexibilité nuit et week-end** (rules mode) |
+| Tariff calendar      | `holidays-fr`: French public holidays (+ Alsace-Moselle), computed locally                        |
+| Scene trigger        | `tariff_period_changed`                                                                           |
+| Scene action         | `get_current_tariff`                                                                              |
+| Dashboard widget     | `enercoop`: price and period now, followed offer, next change                                     |
+| Configuration button | Check the contract                                                                                |
+| Languages            | English, French, German, Spanish (manifest, messages, widget, documentation)                      |
 
-### Where the data comes from
+### No meter reading
 
-Enercoop supplies the electricity, **Enedis** reads the meter. The readings come from the Enedis "Mesure synchrone
-V2" API through [Conso API](https://conso.boris.sh), a free open-source relay: the user gives their consent once and
-pastes a token. Readings of a day arrive the next morning, so the integration publishes **dated consumption**
-(`publishEnergyConsumption`) rather than an index or live states, and Gladys prices every half-hour with the
-Enercoop contract the user attached to the meter.
+A manifest `type: "provider"`: no device, no Internet access. The consumption comes from the meter the user already
+has in Gladys — Linky through the Enedis integration of Gladys Plus, a Lixee TIC, a Shelly EM… — and Gladys prices
+it with the Enercoop contract attached to that meter. Version 0.0.1 read the Linky itself through Conso API; that was
+removed so the integration does not compete with the Enedis integration of Gladys Plus, and so it works for any meter.
 
 ### Energy contracts
 
@@ -47,15 +44,13 @@ and the `get_current_tariff` action — one source, no drift.
 .
 ├─ index.js                         # SDK wiring, timers, lifecycle
 ├─ src/
-│  ├─ config.js, i18n.js, time.js, holidays.js, state.js
-│  ├─ conso/                        # Conso API client + Enedis answer parsing
-│  ├─ devices/meter.js              # the Linky device
-│  ├─ enercoop/                     # service (sync, events, contracts), tariffs, messages
+│  ├─ config.js, i18n.js, time.js, holidays.js
+│  ├─ enercoop/                     # service (contracts, holidays, tariff watch), tariffs, messages
 │  └─ capabilities/                 # scene actions, widget
 ├─ docs/{en,fr,de,es}.md            # user documentation (re-hosted by Gladys)
-├─ test/                            # node --test, SDK fake Gladys, fake fetch
+├─ test/                            # node --test, SDK fake Gladys
 ├─ gladys-assistant-integration.json
-├─ Dockerfile                       # Node 24 Alpine, read-only rootfs, writes only /data
+├─ Dockerfile                       # Node 24 Alpine, read-only rootfs
 ├─ CHANGELOG.md · CLAUDE.md · SECURITY.md
 ├─ .github/workflows/               # ci, release, build, github-release
 ├─ .github/scripts/changelog-release.mjs
@@ -78,7 +73,7 @@ Run it against a Gladys instance:
 GLADYS_HOST_API_URL="http://localhost:1443" \
 GLADYS_INTEGRATION_TOKEN="<token>" \
 GLADYS_INTEGRATION_SELECTOR="enercoop" \
-DATA_DIR=./data LOG_LEVEL=debug \
+LOG_LEVEL=debug \
 npm start
 ```
 
