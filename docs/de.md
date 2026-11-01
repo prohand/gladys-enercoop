@@ -1,105 +1,83 @@
 # Enercoop für Gladys Assistant
 
-Diese Integration bringt den Verbrauch deines **Linky**-Zählers und deine **Enercoop-Verträge** in Gladys: Gladys
-berechnet die Kosten jeder halben Stunde, weiß, wann der Niedertarif beginnt, und kann Szenen starten.
+Diese Integration bringt die **Enercoop-Verträge** in Gladys: Gladys berechnet die Kosten deines Verbrauchs mit den
+Enercoop-Preisen, weiß, wann der Niedertarif beginnt (Wochenende und Feiertage inbegriffen), und kann Szenen
+starten.
+
+Sie liest **keinen Zähler** ab: Der Verbrauch kommt von dem Stromzähler, den du schon in Gladys hast.
 
 ## Was du brauchst
 
-- Einen **Enercoop**-Stromvertrag und einen **Linky**-Zähler.
-- Deine **PRM** (Lieferstelle): 14 Ziffern, auf deiner Enercoop-Rechnung oder auf dem Linky-Display (Taste
-  „n° PRM“).
-- Ein **Conso-API-Token**. Enercoop liefert den Strom, aber **Enedis** liest den Zähler ab: Die Messwerte kommen von
-  Enedis über [Conso API](https://conso.boris.sh), einen kostenlosen Open-Source-Dienst.
+- Einen **Enercoop**-Stromvertrag.
+- Einen **Stromzähler in Gladys**, zum Beispiel:
+  - deinen **Linky** über die **Enedis**-Integration von Gladys (mit Gladys Plus);
+  - ein **Lixee TIC**-Modul (Zigbee) am Linky;
+  - eine Messzange oder ein Messmodul (Shelly EM, Shelly Pro 3EM…).
 - Gladys **5.3** oder neuer.
 
-## 1. Conso-API-Token erhalten
+## 1. Die Integration installieren
 
-1. Öffne [conso.boris.sh](https://conso.boris.sh) und klicke auf die Zustimmungsschaltfläche.
-2. Melde dich in deinem Enedis-Konto an und stimme der Weitergabe deiner Daten zu.
-3. Kopiere das am Ende angezeigte **Token**. Behalte es für dich: Es gibt Zugriff auf deinen Verbrauch.
+In Gladys: **Integrationen → Enercoop → Installieren**.
 
-Für den Verbrauch **pro halbe Stunde** (nötig, um den Niedertarif richtig zu berechnen) aktiviere auch die
-**halbstündliche Datenerfassung** in deinem Enedis-Konto. Ohne sie wähle die **täglichen** Messwerte.
+Eine optionale Einstellung:
 
-## 2. Integration einrichten
+| Feld                   | Zweck                                                      |
+| ---------------------- | ---------------------------------------------------------- |
+| Feiertage Elsass-Mosel | Fügt Karfreitag und den 26. Dezember den Feiertagen hinzu. |
 
-In Gladys: **Integrationen → Enercoop → Konfiguration**.
+## 2. Deinem Zähler einen Enercoop-Vertrag zuordnen
 
-| Feld                       | Zweck                                                                        |
-| -------------------------- | ---------------------------------------------------------------------------- |
-| PRM                        | Die 14 Ziffern deiner Lieferstelle.                                          |
-| Conso-API-Token            | Das Token aus Schritt 1 (wird nie wieder angezeigt).                         |
-| Messwerte                  | „Alle 30 Minuten“ (Lastgang) oder „Täglich“.                                 |
-| Zu importierender Verlauf  | Tage, die bei der ersten Synchronisierung gelesen werden (höchstens 365).    |
-| Synchronisierungsintervall | Wie oft, in Stunden, Enedis abgefragt wird (standardmäßig 6 h).              |
-| Tägliche Warnschwelle      | Über so vielen kWh pro Tag löst der Szenenauslöser „Schwelle“ aus (0 = aus). |
-| Feiertage Elsass-Mosel     | Fügt Karfreitag und den 26. Dezember den Feiertagen hinzu.                   |
-
-Klicke auf **Verbindung testen**: Der letzte verfügbare Messwert sollte erscheinen.
-
-## 3. Zähler anlegen
-
-Öffne den Reiter **Erkennung** der Integration und lege das Gerät **Linky Enercoop** an. Solange es nicht existiert,
-warten die Messwerte (der Status zeigt es an). Klicke dann auf **Jetzt synchronisieren**.
-
-Die Werte eines Tages kommen **am nächsten Morgen**: Enedis veröffentlicht sie über Nacht. Es gibt keinen
-Echtzeitwert, das ist normal.
-
-## 4. Enercoop-Vertrag zuordnen
-
-Füge in den **Energie**-Einstellungen von Gladys dem Zähler einen Vertrag hinzu und wähle eines der
+Füge in den **Energie**-Einstellungen von Gladys deinem Stromzähler einen Vertrag hinzu und wähle eines der
 Enercoop-Angebote der Integration:
 
 - **Enercoop – Basisangebot**: ein Preis den ganzen Tag.
-- **Enercoop – Flexibilität Niedertarif**: Hoch- / Niedertarifpreise. Die Niedertarifzeiten sind die deines Zählers,
-  von Enedis festgelegt und auf deiner Rechnung angegeben (standardmäßig 22 – 6 Uhr).
+- **Enercoop – Flexibilität Niedertarif**: Hoch- / Niedertarifpreise. Die Niedertarifzeiten sind die deines
+  Zählers, von Enedis festgelegt und auf deiner Rechnung angegeben (standardmäßig 22 – 6 Uhr).
 - **Enercoop – Flexibilität Nacht und Wochenende**: Niedertarif werktags von 23 bis 6 Uhr, das ganze Wochenende und
   an Feiertagen.
 
-Die vorgeschlagenen Preise sind **Richtwerte** (inkl. MwSt., 6 kVA, Oktober 2026). **Übernimm die Werte deiner
-Rechnung**: Preis pro kWh und monatliche Grundgebühr. Ändert Enercoop seine Preise, passe einfach den Vertrag in
+Die vorgeschlagenen Preise sind **Richtwerte** (inkl. MwSt., 6 kVA, Oktober 2026). **Übernimm die deiner
+Rechnung**: Preis pro kWh und monatliche Grundgebühr. Wenn Enercoop die Preise ändert, passe einfach den Vertrag in
 Gladys an.
 
-Die Integration veröffentlicht selbst den **Feiertagskalender** (`holidays-fr`), den das Angebot „Nacht und
-Wochenende“ liest. Veröffentlicht ihn bereits eine andere Integration, behält diese ihn: Alles funktioniert gleich.
+Geh dann zu **Integrationen → Enercoop → Konfiguration** und klicke auf **Vertrag prüfen**: Angebot, aktueller
+Preis und nächster Wechsel sollten erscheinen.
+
+Die Integration veröffentlicht den **Feiertagskalender** (`holidays-fr`) für das Angebot „Nacht und Wochenende“
+selbst. Veröffentlicht ihn schon eine andere Integration, behält diese ihn: Alles funktioniert gleich.
 
 ## Widget
 
-Füge das Widget **Enercoop** einem Dashboard hinzu: Verbrauch des letzten Tages, aktueller Preis und Zeitraum
-(Hoch- / Niedertarif), Diagramm der letzten 14 Tage, nächster Tarifwechsel, Synchronisierungsstatus und eine
-Schaltfläche **Jetzt abrufen**.
+Füge das **Enercoop**-Widget einem Dashboard hinzu: aktueller Preis und Zeitraum (HT / NT), verfolgtes Angebot und
+nächster Tarifwechsel. Verbrauch und Kosten zeigen die Energie-Widgets von Gladys an deinem Zähler.
 
 ## Szenen
 
 **Auslöser** (Kategorie Integrationen):
 
-- **Enercoop: neuer Tagesverbrauch** — Variablen `date` und `kwh`.
-- **Enercoop: Tagesverbrauch über der Schwelle** — Variablen `date`, `kwh`, `threshold_kwh`.
-- **Enercoop: Tarifzeitraum gewechselt** — Filter auf den neuen Zeitraum (Nieder- / Hochtarif), Variablen `period`,
-  `label`, `price`. Beispiel: den Warmwasserbereiter zu Beginn des Niedertarifs einschalten.
+- **Enercoop: Tarifzeitraum gewechselt** — Filter auf den neuen Zeitraum (Niedertarif / Hochtarif), Variablen
+  `period`, `label`, `price`. Beispiel: den Warmwasserbereiter zu Beginn des Niedertarifs starten, auch am
+  Wochenende.
 
-**Aktionen**:
+**Aktion**:
 
-- **Enercoop: Zähler jetzt ablesen** — liefert `published`, `last_day`, `last_day_kwh`.
 - **Enercoop: aktuellen Preis abfragen** — liefert `period`, `label`, `price`, `is_off_peak`. Beispiel: die
   Spülmaschine nur starten, wenn `is_off_peak` wahr ist.
 
-Die Zeitraumwechsel richten sich nach dem in Gladys zugeordneten Enercoop-Vertrag.
+Die Zeitraumwechsel richten sich nach dem in Gladys zugeordneten Enercoop-Vertrag. Alles wird lokal berechnet: Es
+ist kein Internetzugang nötig.
 
-## Cloud-Verbindung
+## Du hattest Version 0.0.1?
 
-Die Messwerte gehen über das Internet (Enedis → Conso API → Gladys): Die Integration ist als **Cloud** markiert. Das
-Geräte-Badge wechselt auf „nicht erreichbar“, wenn die letzte Synchronisierung fehlschlug. Niedertarifzeiten und
-Feiertage werden lokal berechnet.
+Version 0.0.1 las den Linky über Conso API und legte ein Gerät **Linky Enercoop** an. Das ist vorbei:
+
+1. Ordne in den **Energie**-Einstellungen deinen Enercoop-Vertrag deinem echten Zähler zu (Enedis, Lixee TIC…).
+2. Lösche das Gerät **Linky Enercoop**, wenn du es nicht mehr brauchst.
+3. Du kannst auch die auf conso.boris.sh erteilte Zustimmung widerrufen.
 
 ## Fehlerbehebung
 
-- **„Conso API lehnt das Token ab“**: Das Token ist abgelaufen oder widerrufen. Wiederhole Schritt 1 und füge das
-  neue ein.
-- **„Dieses Token gilt für eine andere PRM“**: Die eingegebene PRM passt nicht zur erteilten Zustimmung.
-- **„Enedis lehnt den Lastgang ab“**: Aktiviere die halbstündliche Erfassung im Enedis-Konto (sie beginnt am
-  nächsten Tag) oder wechsle zu täglichen Messwerten.
-- **„Der Zähler ist in Gladys noch nicht angelegt“**: Lege ihn im Reiter Erkennung an.
-- Kein Preis und kein Niedertarif im Widget: Ordne dem Zähler einen Enercoop-Vertrag zu (Schritt 4).
+- **„Noch kein Enercoop-Vertrag in Gladys“**: Ordne deinem Zähler einen Enercoop-Vertrag zu (Schritt 2).
+- Die Kosten bleiben leer: Prüfe, ob dein Zähler seinen Verbrauch wirklich in Gladys veröffentlicht.
 
-Mehr Details findest du in den Logs der Integration in Gladys. Das Token erscheint nie in den Logs.
+Mehr Details findest du in den Logs der Integration in Gladys.

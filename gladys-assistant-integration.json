@@ -1,12 +1,12 @@
 {
   "manifest_version": 1,
-  "type": "device",
+  "type": "provider",
   "name": "Enercoop",
   "description": {
-    "en": "Your Linky consumption and Enercoop contracts in Gladys: costs, off-peak hours, scenes.",
-    "fr": "Votre consommation Linky et vos contrats Enercoop dans Gladys : coûts, heures creuses, scènes.",
-    "de": "Dein Linky-Verbrauch und deine Enercoop-Verträge in Gladys: Kosten, Niedertarif, Szenen.",
-    "es": "Su consumo Linky y sus contratos Enercoop en Gladys: costes, horas valle y escenas."
+    "en": "Enercoop contracts in Gladys: prices, off-peak hours, weekends, public holidays, scenes.",
+    "fr": "Les contrats Enercoop dans Gladys : prix, heures creuses, week-end, jours fériés, scènes.",
+    "de": "Enercoop-Verträge in Gladys: Preise, Niedertarif, Wochenende, Feiertage, Szenen.",
+    "es": "Los contratos Enercoop en Gladys: precios, horas valle, fines de semana, festivos, escenas."
   },
   "version": "0.0.1",
   "docker_image": "ghcr.io/prohand/gladys-enercoop:0.0.1",
@@ -15,18 +15,17 @@
   "categories": ["energy"],
   "keywords": [
     "enercoop",
-    "linky",
-    "enedis",
     "heures creuses",
     "flexibilité",
+    "nuit et week-end",
+    "jours fériés",
+    "contrat énergie",
+    "tarif électricité",
     "électricité verte",
-    "conso api",
-    "prm",
     "fournisseur électricité",
     "coopérative"
   ],
   "countries": ["FR"],
-  "transports": ["cloud"],
   "config_schema": [
     {
       "key": "intro",
@@ -38,21 +37,12 @@
         "es": "Primeros pasos"
       },
       "description": {
-        "en": "Enercoop supplies the electricity, Enedis reads the Linky meter. The readings come from Enedis through Conso API, a free service: give your consent once on conso.boris.sh, then paste your PRM (14 digits, on your Enercoop bill) and the token you get. The readings of a day arrive the next morning. Then create the meter in the Discovery tab and attach an Enercoop contract to it in the Energy settings of Gladys.",
-        "fr": "Enercoop fournit l'électricité, Enedis relève le compteur Linky. Les relevés viennent d'Enedis par Conso API, un service gratuit : donnez votre consentement une fois sur conso.boris.sh, puis collez votre PRM (14 chiffres, sur votre facture Enercoop) et le jeton obtenu. Les relevés d'une journée arrivent le lendemain matin. Créez ensuite le compteur dans l'onglet Découverte et associez-lui un contrat Enercoop dans les réglages Énergie de Gladys.",
-        "de": "Enercoop liefert den Strom, Enedis liest den Linky-Zähler ab. Die Messwerte kommen von Enedis über Conso API, einen kostenlosen Dienst: Erteile einmal deine Zustimmung auf conso.boris.sh und füge dann deine PRM (14 Ziffern, auf deiner Enercoop-Rechnung) und das erhaltene Token ein. Die Werte eines Tages kommen am nächsten Morgen. Lege danach den Zähler im Reiter Erkennung an und ordne ihm in den Energie-Einstellungen von Gladys einen Enercoop-Vertrag zu.",
-        "es": "Enercoop suministra la electricidad, Enedis lee el contador Linky. Las lecturas vienen de Enedis a través de Conso API, un servicio gratuito: dé su consentimiento una vez en conso.boris.sh y pegue su PRM (14 dígitos, en su factura de Enercoop) y el token obtenido. Las lecturas de un día llegan a la mañana siguiente. Después cree el contador en la pestaña Descubrimiento y asígnele un contrato de Enercoop en los ajustes de Energía de Gladys."
+        "en": "This integration adds the Enercoop offers to the Gladys contract wizard and tells when off-peak hours start. It does not read any meter: the consumption comes from the electricity meter you already have in Gladys (Linky through the Enedis integration of Gladys Plus, Lixee TIC, Shelly EM…). In the Energy settings of Gladys, add an Enercoop contract to that meter and copy the prices of your bill.",
+        "fr": "Cette intégration ajoute les offres Enercoop à l'assistant de contrat de Gladys et sait quand commencent les heures creuses. Elle ne relève aucun compteur : la consommation vient du compteur électrique que vous avez déjà dans Gladys (Linky par l'intégration Enedis de Gladys Plus, Lixee TIC, Shelly EM…). Dans les réglages Énergie de Gladys, ajoutez un contrat Enercoop à ce compteur et reprenez les prix de votre facture.",
+        "de": "Diese Integration fügt die Enercoop-Angebote dem Vertragsassistenten von Gladys hinzu und weiß, wann der Niedertarif beginnt. Sie liest keinen Zähler ab: Der Verbrauch kommt von dem Stromzähler, den du schon in Gladys hast (Linky über die Enedis-Integration von Gladys Plus, Lixee TIC, Shelly EM…). Ordne diesem Zähler in den Energie-Einstellungen von Gladys einen Enercoop-Vertrag zu und übernimm die Preise deiner Rechnung.",
+        "es": "Esta integración añade las ofertas de Enercoop al asistente de contratos de Gladys y sabe cuándo empiezan las horas valle. No lee ningún contador: el consumo viene del contador eléctrico que ya tiene en Gladys (Linky mediante la integración Enedis de Gladys Plus, Lixee TIC, Shelly EM…). En los ajustes de Energía de Gladys, asigne un contrato de Enercoop a ese contador y copie los precios de su factura."
       },
       "links": [
-        {
-          "url": "https://conso.boris.sh",
-          "label": {
-            "en": "Get a Conso API token",
-            "fr": "Obtenir un jeton Conso API",
-            "de": "Conso-API-Token erhalten",
-            "es": "Obtener un token de Conso API"
-          }
-        },
         {
           "url": "https://www.enercoop.fr",
           "label": {
@@ -63,144 +53,6 @@
           }
         }
       ]
-    },
-    {
-      "key": "prm",
-      "type": "string",
-      "label": {
-        "en": "PRM (delivery point)",
-        "fr": "PRM (point de livraison)",
-        "de": "PRM (Lieferstelle)",
-        "es": "PRM (punto de suministro)"
-      },
-      "description": {
-        "en": "The 14 digits of your delivery point, on your Enercoop bill or your Linky (key 'n° PRM').",
-        "fr": "Les 14 chiffres de votre point de livraison, sur votre facture Enercoop ou votre Linky (touche « n° PRM »).",
-        "de": "Die 14 Ziffern deiner Lieferstelle, auf deiner Enercoop-Rechnung oder am Linky (Taste „n° PRM“).",
-        "es": "Los 14 dígitos de su punto de suministro, en su factura de Enercoop o en su Linky (tecla «n° PRM»)."
-      },
-      "placeholder": {
-        "en": "e.g. 12345678901234",
-        "fr": "ex. 12345678901234",
-        "de": "z. B. 12345678901234",
-        "es": "p. ej. 12345678901234"
-      },
-      "required": true
-    },
-    {
-      "key": "token",
-      "type": "secret",
-      "label": {
-        "en": "Conso API token",
-        "fr": "Jeton Conso API",
-        "de": "Conso-API-Token",
-        "es": "Token de Conso API"
-      },
-      "description": {
-        "en": "Given by conso.boris.sh at the end of the Enedis consent. Never shown again once saved.",
-        "fr": "Fourni par conso.boris.sh à la fin du consentement Enedis. Jamais réaffiché une fois enregistré.",
-        "de": "Wird von conso.boris.sh am Ende der Enedis-Zustimmung angezeigt. Nach dem Speichern nie wieder sichtbar.",
-        "es": "Lo proporciona conso.boris.sh al final del consentimiento de Enedis. No se vuelve a mostrar una vez guardado."
-      },
-      "required": true
-    },
-    {
-      "key": "granularity",
-      "type": "select",
-      "label": {
-        "en": "Readings",
-        "fr": "Relevés",
-        "de": "Messwerte",
-        "es": "Lecturas"
-      },
-      "description": {
-        "en": "Every 30 minutes is needed to price off-peak hours right; it requires the half-hourly collection enabled in your Enedis account.",
-        "fr": "La demi-heure est nécessaire pour bien chiffrer les heures creuses ; elle demande la collecte horaire activée dans votre espace Enedis.",
-        "de": "Halbstündlich ist nötig, um Niedertarifzeiten richtig zu berechnen; dafür muss die halbstündliche Erfassung im Enedis-Konto aktiv sein.",
-        "es": "Cada 30 minutos es necesario para valorar bien las horas valle; requiere activar la recogida horaria en su cuenta de Enedis."
-      },
-      "required": false,
-      "default": "thirty_minutes",
-      "options": [
-        {
-          "value": "thirty_minutes",
-          "label": {
-            "en": "Every 30 minutes (load curve)",
-            "fr": "Toutes les 30 minutes (courbe de charge)",
-            "de": "Alle 30 Minuten (Lastgang)",
-            "es": "Cada 30 minutos (curva de carga)"
-          }
-        },
-        {
-          "value": "daily",
-          "label": {
-            "en": "Daily",
-            "fr": "Quotidiens",
-            "de": "Täglich",
-            "es": "Diarias"
-          }
-        }
-      ]
-    },
-    {
-      "key": "history_days",
-      "type": "number",
-      "label": {
-        "en": "History to import (days)",
-        "fr": "Historique à importer (jours)",
-        "de": "Zu importierender Verlauf (Tage)",
-        "es": "Historial a importar (días)"
-      },
-      "description": {
-        "en": "How far back the first sync reads, up to a year.",
-        "fr": "Jusqu'où remonte la première synchronisation, un an au plus.",
-        "de": "Wie weit die erste Synchronisierung zurückgeht, höchstens ein Jahr.",
-        "es": "Hasta dónde llega la primera sincronización, un año como máximo."
-      },
-      "required": false,
-      "default": 30,
-      "min": 1,
-      "max": 365
-    },
-    {
-      "key": "sync_interval_hours",
-      "type": "number",
-      "label": {
-        "en": "Sync interval (hours)",
-        "fr": "Intervalle de synchronisation (heures)",
-        "de": "Synchronisierungsintervall (Stunden)",
-        "es": "Intervalo de sincronización (horas)"
-      },
-      "description": {
-        "en": "How often Enedis is asked for new readings. They change once a day: there is no point in asking more often than every few hours.",
-        "fr": "Fréquence à laquelle Enedis est interrogé. Les relevés changent une fois par jour : inutile de demander plus souvent que toutes les quelques heures.",
-        "de": "Wie oft Enedis nach neuen Messwerten gefragt wird. Sie ändern sich einmal am Tag: Häufiger als alle paar Stunden lohnt sich nicht.",
-        "es": "Frecuencia con la que se consulta a Enedis. Las lecturas cambian una vez al día: no sirve de nada preguntar más que cada pocas horas."
-      },
-      "required": false,
-      "default": 6,
-      "min": 1,
-      "max": 24
-    },
-    {
-      "key": "daily_threshold_kwh",
-      "type": "number",
-      "label": {
-        "en": "Daily alert threshold (kWh)",
-        "fr": "Seuil d'alerte quotidien (kWh)",
-        "de": "Tägliche Warnschwelle (kWh)",
-        "es": "Umbral de alerta diario (kWh)"
-      },
-      "description": {
-        "en": "A day above it fires the scene trigger 'Daily consumption over the threshold'. 0 turns it off.",
-        "fr": "Une journée au-dessus déclenche la scène « Consommation quotidienne au-dessus du seuil ». 0 la désactive.",
-        "de": "Ein Tag darüber löst den Szenenauslöser „Tagesverbrauch über der Schwelle“ aus. 0 schaltet ihn ab.",
-        "es": "Un día por encima dispara el desencadenante «Consumo diario por encima del umbral». 0 lo desactiva."
-      },
-      "required": false,
-      "default": 0,
-      "min": 0,
-      "max": 500
     },
     {
       "key": "alsace_moselle",
@@ -225,97 +77,15 @@
     {
       "key": "test_connection",
       "label": {
-        "en": "Test the connection",
-        "fr": "Tester la connexion",
-        "de": "Verbindung testen",
-        "es": "Probar la conexión"
+        "en": "Check the contract",
+        "fr": "Vérifier le contrat",
+        "de": "Vertrag prüfen",
+        "es": "Comprobar el contrato"
       },
-      "timeout_seconds": 45
-    },
-    {
-      "key": "sync_now",
-      "label": {
-        "en": "Sync now",
-        "fr": "Synchroniser maintenant",
-        "de": "Jetzt synchronisieren",
-        "es": "Sincronizar ahora"
-      },
-      "timeout_seconds": 120
+      "timeout_seconds": 15
     }
   ],
   "scene_triggers": [
-    {
-      "key": "daily_consumption_available",
-      "label": {
-        "en": "Enercoop: new daily consumption",
-        "fr": "Enercoop : nouvelle consommation quotidienne",
-        "de": "Enercoop: neuer Tagesverbrauch",
-        "es": "Enercoop: nuevo consumo diario"
-      },
-      "variables": [
-        {
-          "key": "date",
-          "type": "string",
-          "label": {
-            "en": "Day",
-            "fr": "Jour",
-            "de": "Tag",
-            "es": "Día"
-          }
-        },
-        {
-          "key": "kwh",
-          "type": "number",
-          "label": {
-            "en": "Consumption (kWh)",
-            "fr": "Consommation (kWh)",
-            "de": "Verbrauch (kWh)",
-            "es": "Consumo (kWh)"
-          }
-        }
-      ]
-    },
-    {
-      "key": "daily_threshold_exceeded",
-      "label": {
-        "en": "Enercoop: daily consumption over the threshold",
-        "fr": "Enercoop : consommation quotidienne au-dessus du seuil",
-        "de": "Enercoop: Tagesverbrauch über der Schwelle",
-        "es": "Enercoop: consumo diario por encima del umbral"
-      },
-      "variables": [
-        {
-          "key": "date",
-          "type": "string",
-          "label": {
-            "en": "Day",
-            "fr": "Jour",
-            "de": "Tag",
-            "es": "Día"
-          }
-        },
-        {
-          "key": "kwh",
-          "type": "number",
-          "label": {
-            "en": "Consumption (kWh)",
-            "fr": "Consommation (kWh)",
-            "de": "Verbrauch (kWh)",
-            "es": "Consumo (kWh)"
-          }
-        },
-        {
-          "key": "threshold_kwh",
-          "type": "number",
-          "label": {
-            "en": "Threshold (kWh)",
-            "fr": "Seuil (kWh)",
-            "de": "Schwelle (kWh)",
-            "es": "Umbral (kWh)"
-          }
-        }
-      ]
-    },
     {
       "key": "tariff_period_changed",
       "label": {
@@ -392,48 +162,6 @@
   ],
   "scene_actions": [
     {
-      "key": "sync_consumption",
-      "label": {
-        "en": "Enercoop: read the meter now",
-        "fr": "Enercoop : relever le compteur maintenant",
-        "de": "Enercoop: Zähler jetzt ablesen",
-        "es": "Enercoop: leer el contador ahora"
-      },
-      "timeout_seconds": 120,
-      "outputs": [
-        {
-          "key": "published",
-          "type": "number",
-          "label": {
-            "en": "Readings published",
-            "fr": "Relevés publiés",
-            "de": "Veröffentlichte Messwerte",
-            "es": "Lecturas publicadas"
-          }
-        },
-        {
-          "key": "last_day",
-          "type": "string",
-          "label": {
-            "en": "Last day",
-            "fr": "Dernier jour",
-            "de": "Letzter Tag",
-            "es": "Último día"
-          }
-        },
-        {
-          "key": "last_day_kwh",
-          "type": "number",
-          "label": {
-            "en": "Last day (kWh)",
-            "fr": "Dernier jour (kWh)",
-            "de": "Letzter Tag (kWh)",
-            "es": "Último día (kWh)"
-          }
-        }
-      ]
-    },
-    {
       "key": "get_current_tariff",
       "label": {
         "en": "Enercoop: get the current price",
@@ -496,13 +224,12 @@
         "es": "Enercoop"
       },
       "description": {
-        "en": "Last day, current price and period, 14-day chart, next tariff change.",
-        "fr": "Dernier jour, prix et période actuels, 14 derniers jours, prochain changement.",
-        "de": "Letzter Tag, aktueller Preis und Zeitraum, 14 Tage, nächster Tarifwechsel.",
-        "es": "Último día, precio y periodo actuales, 14 días, próximo cambio de tarifa."
+        "en": "Current price and period, next tariff change.",
+        "fr": "Prix et période actuels, prochain changement de tarif.",
+        "de": "Aktueller Preis und Zeitraum, nächster Tarifwechsel.",
+        "es": "Precio y periodo actuales, próximo cambio de tarifa."
       },
-      "icon": "zap",
-      "action_timeout_seconds": 120
+      "icon": "zap"
     }
   ],
   "energy_contracts": {

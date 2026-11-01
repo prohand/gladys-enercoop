@@ -40,7 +40,7 @@ function multiLanguageTexts(node, path = 'manifest', found = []) {
 
 test('every text of the manifest is written in English, French, German and Spanish', () => {
   const texts = multiLanguageTexts(manifest);
-  assert.ok(texts.length > 50);
+  assert.ok(texts.length > 30);
   for (const { path, text } of texts) {
     assert.deepEqual(Object.keys(text).sort(), [...LANGUAGES].sort(), path);
     for (const language of LANGUAGES) {
@@ -64,8 +64,12 @@ test('version, image and Gladys range agree', () => {
   assert.equal(manifest.gladys_version, '>=5.3.0');
 });
 
-test('the cloud tag: the readings come from Enedis through Conso API', () => {
-  assert.deepEqual(manifest.transports, ['cloud']);
+test('a provider: no device, no meter reading, no transport tag', () => {
+  // The consumption comes from the meter the user already has in Gladys
+  // (Gladys Plus Enedis, Lixee TIC…): this integration must not read one.
+  assert.equal(manifest.type, 'provider');
+  assert.equal(manifest.transports, undefined);
+  assert.doesNotMatch(JSON.stringify(manifest), /conso\.boris\.sh|Conso API/i);
   assert.deepEqual(manifest.categories, ['energy']);
   assert.deepEqual(manifest.countries, ['FR']);
 });

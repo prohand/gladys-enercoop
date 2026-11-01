@@ -4,71 +4,36 @@
 // SDK wiring only — the work lives in src/enercoop/service.js:
 //   1. instantiate the SDK (connection, auth, reconnection: handled for it);
 //   2. register every handler BEFORE connect();
-//   3. on each (re)connection: config, devices, contracts, holidays, sync,
-//      and the timers (meter sync, tariff watch, holiday calendar).
+//   3. on each (re)connection: config, contracts, holidays, and the timers
+//      (tariff watch, contracts, holiday calendar).
+//
+// A `provider` integration: no device. The consumption comes from the meter
+// the user already has in Gladys, priced with the Enercoop contract they
+// attach to it.
 //
 // Environment variables injected by the Gladys supervisor, read by the SDK:
 // GLADYS_HOST_API_URL, GLADYS_INTEGRATION_TOKEN, GLADYS_INTEGRATION_SELECTOR.
 // -----------------------------------------------------------------------------
 
 import { GladysIntegration, logger } from '@gladysassistant/integration-sdk';
-import { isConfigured, normalizeConfig } from './src/config.js';
-import { buildDiscoveredDevices, meter } from './src/devices/meter.js';
+import { normalizeConfig } from './src/config.js';
 import { createService } from './src/enercoop/service.js';
-import { MESSAGES, explainError } from './src/enercoop/messages.js';
 import { SCENE_ACTIONS } from './src/capabilities/scenes.js';
-import { WIDGETS, ENERCOOP_WIDGET } from './src/capabilities/widget.js';
-import { createStore } from './src/state.js';
-import { localize, pick } from './src/i18n.js';
+import { WIDGETS } from './src/capabilities/widget.js';
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
-// After a failed sync, try again sooner than the normal interval.
-const RETRY_DELAY_MS = 30 * MINUTE_MS;
 const CONTRACTS_REFRESH_MS = 15 * MINUTE_MS;
 const HOLIDAYS_REFRESH_MS = 12 * HOUR_MS;
 
 const gladys = new GladysIntegration();
-const store = createStore();
-const service = createService({ gladys, store });
+const service = createService({ gladys });
 service.setConfig(normalizeConfig());
 
-let syncTimer = null;
 let periodicTimers = [];
 
-// --- Discovery ---------------------------------------------------------------
-gladys.onScanRequest(async () => {
-  await gladys.publishDiscoveredDevices(buildDiscoveredDevices(gladys, service.config));
-});
-
-// The user just created the meter: the readings refused with a 404 so far can
-// be published now.
-gladys.onDeviceCreated(async (device) => {
-  if (device.external_id === meter.deviceExternalId(gladys, service.config)) {
-    logger.info('Meter created in Gladys -> sync');
-    await syncNow();
-  }
-});
-
-// --- Configuration screen buttons --------------------------------------------
-gladys.onAction('test_connection', () => service.testConnection());
-
-gladys.onAction('sync_now', async () => {
-  try {
-    const { published, day } = await service.sync();
-    await publishTransports();
-    return localize((language) =>
-      pick(language, {
-        en: `Sync done: ${published} reading(s) published${day ? `, last day ${day.date}` : ''}.`,
-        fr: `Synchronisation terminée : ${published} relevé(s) publié(s)${day ? `, dernier jour ${day.date}` : ''}.`,
-        de: `Synchronisierung fertig: ${published} Messwert(e) veröffentlicht${day ? `, letzter Tag ${day.date}` : ''}.`,
-        es: `Sincronización terminada: ${published} lectura(s) publicada(s)${day ? `, último día ${day.date}` : ''}.`,
-      }),
-    );
-  } catch (err) {
-    return explainError(err);
-  }
-});
+// --- Configuration screen button ---------------------------------------------
+gladys.onAction('test_connection', () => service.checkContract());
 
 // --- Scene actions -----------------------------------------------------------
 for (const [actionKey, handler] of Object.entries(SCENE_ACTIONS)) {
@@ -78,9 +43,6 @@ for (const [actionKey, handler] of Object.entries(SCENE_ACTIONS)) {
 // --- Dashboard widget --------------------------------------------------------
 for (const [widgetKey, widget] of Object.entries(WIDGETS)) {
   gladys.onWidgetGet(widgetKey, (request) => widget.get(service, request));
-  gladys.onWidgetAction(widgetKey, (actionKey, params, { settings }) =>
-    widget.action(service, { actionKey, params, settings }),
-  );
 }
 
 // --- Configuration updated ---------------------------------------------------
@@ -103,13 +65,11 @@ gladys.on('disconnected', () => {
 async function initialize() {
   stopTimers();
   try {
-    await store.load();
-    await gladys.publishDiscoveredDevices(buildDiscoveredDevices(gladys, service.config));
     await service.refreshContracts().catch((err) => logger.warn('Contracts', err.message));
     await service.publishHolidays().catch((err) => logger.warn('Holidays', err.message));
     await service.checkTariff();
     startTimers();
-    await syncNow();
+    await gladys.setConnectionStatus(true).catch(() => {});
   } catch (err) {
     logger.error('Initialization failed', err);
     await gladys
@@ -120,36 +80,6 @@ async function initialize() {
         es: 'La inicialización ha fallado, consulte los registros de la integración.',
       })
       .catch(() => {});
-  }
-}
-
-// Sync, report the status, then plan the next one.
-async function syncNow() {
-  clearTimeout(syncTimer);
-  let delay = service.config.sync_interval_hours * HOUR_MS;
-  if (!isConfigured(service.config)) {
-    await gladys.setConnectionStatus(false, MESSAGES.notConfigured).catch(() => {});
-    gladys.requestWidgetRefresh(ENERCOOP_WIDGET);
-    return;
-  }
-  try {
-    await service.sync();
-    await gladys.setConnectionStatus(true).catch(() => {});
-  } catch (err) {
-    delay = Math.min(delay, RETRY_DELAY_MS);
-    await gladys.setConnectionStatus(false, explainError(err)).catch(() => {});
-  } finally {
-    await publishTransports();
-    syncTimer = setTimeout(syncNow, delay);
-    syncTimer.unref?.();
-  }
-}
-
-async function publishTransports() {
-  const entries = service.transportEntries();
-  if (entries.length > 0) {
-    // The meter may not be created yet: the badge is cosmetic, never fatal.
-    await gladys.publishTransports(entries).catch((err) => logger.debug('Transports', err.message));
   }
 }
 
@@ -178,8 +108,6 @@ function startTimers() {
 }
 
 function stopTimers() {
-  clearTimeout(syncTimer);
-  syncTimer = null;
   for (const timer of periodicTimers) {
     clearTimeout(timer);
     clearInterval(timer);
