@@ -6,6 +6,8 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-16
+
 - Update `@gladysassistant/integration-sdk` to 0.16.1 (security update).
 
 ## [0.1.1] - 2026-11-16
@@ -49,7 +51,8 @@ All notable changes to this integration are documented here. The format follows
 - English, French, German and Spanish texts and documentation.
 - `SECURITY.md`, `CHANGELOG.md` and `CLAUDE.md`; CI, release, build and GitHub release workflows.
 
-[Unreleased]: https://github.com/prohand/gladys-enercoop/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/prohand/gladys-enercoop/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/prohand/gladys-enercoop/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/prohand/gladys-enercoop/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/prohand/gladys-enercoop/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/prohand/gladys-enercoop/releases/tag/v0.0.1
