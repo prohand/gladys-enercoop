@@ -6,6 +6,11 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Declared `transports: ["local"]` (the tariffs ship with the integration, no
+  Internet access): the Local filter of the Gladys catalog now finds it.
+
 ## [0.1.3] - 2026-11-16
 
 - Maintenance release, no functional change.

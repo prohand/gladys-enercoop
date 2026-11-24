@@ -26,6 +26,7 @@
     "coopérative"
   ],
   "countries": ["FR"],
+  "transports": ["local"],
   "config_schema": [
     {
       "key": "intro",
