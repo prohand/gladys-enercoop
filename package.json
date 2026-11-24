@@ -1,6 +1,6 @@
 {
   "name": "gladys-enercoop",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "description": "Gladys Assistant external integration for Enercoop: Enercoop energy contracts, off-peak hours and public holidays.",
   "type": "module",

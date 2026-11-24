@@ -6,6 +6,8 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-24
+
 ### Changed
 
 - Declared `transports: ["local"]` (the tariffs ship with the integration, no
@@ -60,7 +62,8 @@ All notable changes to this integration are documented here. The format follows
 - English, French, German and Spanish texts and documentation.
 - `SECURITY.md`, `CHANGELOG.md` and `CLAUDE.md`; CI, release, build and GitHub release workflows.
 
-[Unreleased]: https://github.com/prohand/gladys-enercoop/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/prohand/gladys-enercoop/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/prohand/gladys-enercoop/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/prohand/gladys-enercoop/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/prohand/gladys-enercoop/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/prohand/gladys-enercoop/compare/v0.1.0...v0.1.1
