@@ -64,11 +64,13 @@ test('version, image and Gladys range agree', () => {
   assert.equal(manifest.gladys_version, '>=5.3.0');
 });
 
-test('a provider: no device, no meter reading, no transport tag', () => {
+test('a provider: no device, no meter reading, a local transport tag', () => {
   // The consumption comes from the meter the user already has in Gladys
   // (Gladys Plus Enedis, Lixee TIC…): this integration must not read one.
   assert.equal(manifest.type, 'provider');
-  assert.equal(manifest.transports, undefined);
+  // The tariffs ship with the code, no Internet access: `local` is the tag the
+  // Local filter of the Gladys catalog reads.
+  assert.deepEqual(manifest.transports, ['local']);
   assert.doesNotMatch(JSON.stringify(manifest), /conso\.boris\.sh|Conso API/i);
   assert.deepEqual(manifest.categories, ['energy']);
   assert.deepEqual(manifest.countries, ['FR']);
